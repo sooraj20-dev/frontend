@@ -1,8 +1,8 @@
 // ═══════════════════════════════════════════════════════
-// LOGIN PAGE - Stunning animated auth
+// LOGIN PAGE — Enterprise Medical, theme-aware
 // ═══════════════════════════════════════════════════════
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Mail, Lock, HeartPulse, ArrowRight, Shield } from 'lucide-react';
@@ -10,12 +10,11 @@ import toast from 'react-hot-toast';
 import { loginUser } from '../services/userService.js';
 import { useAuthStore } from '../store/index.js';
 import FormInput from '../components/FormInput.jsx';
-import AnimatedButton from '../components/AnimatedButton.jsx';
 
-const quickLogins = [
-    { role: 'Admin', color: '#8b5cf6', email: 'admin@medicare.pro', password: 'admin123', badge: '👑' },
-    { role: 'Doctor', color: '#3b82f6', email: 'james.wilson@medicare.pro', password: 'doctor123', badge: '🩺' },
-    { role: 'Patient', color: '#14b8a6', email: 'alice@example.com', password: 'patient123', badge: '👤' },
+const QUICK_LOGINS = [
+    { role: 'Admin', color: '#7C3AED', bg: 'rgba(124,58,237,.08)', border: 'rgba(124,58,237,.2)', email: 'admin@medicare.pro', password: 'admin123', badge: '👑' },
+    { role: 'Doctor', color: '#1E5AA8', bg: 'rgba(30,90,168,.08)', border: 'rgba(30,90,168,.2)', email: 'james.wilson@medicare.pro', password: 'doctor123', badge: '🩺' },
+    { role: 'Patient', color: '#1FA79A', bg: 'rgba(31,167,154,.08)', border: 'rgba(31,167,154,.2)', email: 'alice@example.com', password: 'patient123', badge: '👤' },
 ];
 
 export default function LoginPage() {
@@ -34,7 +33,7 @@ export default function LoginPage() {
             toast.success(`Welcome back, ${res.user.name.split(' ')[0]}!`);
             navigate(`/${res.user.role}`, { replace: true });
         } catch (err) {
-            toast.error(err.message || 'Login failed');
+            toast.error(err.message || 'Invalid credentials');
         } finally {
             setLoading(false);
         }
@@ -46,97 +45,181 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-4 font-sans">
-            {/* Background design element */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-blue-50 blur-[100px] opacity-60" />
-                <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-teal-50 blur-[100px] opacity-60" />
-            </div>
+        <div style={{
+            minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--bg-app)', padding: 16, position: 'relative', overflow: 'hidden',
+        }}>
+            {/* Soft bg orbs */}
+            <div style={{
+                position: 'absolute', top: '-8%', right: '-5%', width: 480, height: 480,
+                borderRadius: '50%', background: 'rgba(30,90,168,.06)', filter: 'blur(80px)', pointerEvents: 'none',
+            }} />
+            <div style={{
+                position: 'absolute', bottom: '-8%', left: '-5%', width: 480, height: 480,
+                borderRadius: '50%', background: 'rgba(31,167,154,.05)', filter: 'blur(80px)', pointerEvents: 'none',
+            }} />
 
-            <div className="relative z-10 w-full max-w-[440px]">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: .35, ease: [.4, 0, .2, 1] }}
+                style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: 420 }}
+            >
                 {/* Header */}
-                <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 mb-6 shadow-lg shadow-blue-200">
-                        <HeartPulse size={24} className="text-white" />
+                <div style={{ textAlign: 'center', marginBottom: 32 }}>
+                    <div style={{
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: 52, height: 52, borderRadius: 14,
+                        background: 'var(--color-primary)',
+                        boxShadow: 'var(--shadow-brand)',
+                        marginBottom: 20,
+                    }}>
+                        <HeartPulse size={24} color="#fff" strokeWidth={2} />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome to MediCare Pro</h1>
-                    <p className="text-slate-500 mt-2 text-sm">Enterprise Hospital Management Solution</p>
+                    <h1 style={{
+                        margin: 0, fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                        fontSize: 26, fontWeight: 800, color: 'var(--text-1)', letterSpacing: '-.03em',
+                    }}>
+                        MediCare<span style={{ color: 'var(--color-primary)' }}>Pro</span>
+                    </h1>
+                    <p style={{ margin: '8px 0 0', fontSize: 13.5, color: 'var(--text-2)' }}>
+                        Enterprise Hospital Management System
+                    </p>
                 </div>
 
-                {/* Form Card */}
-                <div className="bg-white border border-slate-200 rounded-2xl shadow-xl shadow-slate-200/50 p-8">
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                {/* Form card */}
+                <div style={{
+                    background: 'var(--bg-surface)', border: '1px solid var(--border)',
+                    borderRadius: 16, padding: 32,
+                    boxShadow: '0 8px 40px rgba(31,41,51,.08), 0 1px 3px rgba(31,41,51,.06)',
+                }}>
+                    <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 20 }} noValidate>
                         <FormInput
                             label="Email Address"
                             type="email"
                             icon={Mail}
                             placeholder="name@company.com"
                             error={errors.email?.message}
+                            required
+                            autoComplete="email"
                             {...register('email', {
                                 required: 'Email is required',
-                                pattern: { value: /^\S+@\S+$/i, message: 'Invalid email' }
+                                pattern: { value: /^\S+@\S+$/i, message: 'Invalid email format' }
                             })}
                         />
-                        <div className="space-y-1">
-                            <div className="flex justify-between items-center">
-                                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Password</label>
-                                <button type="button" className="text-[11px] font-bold text-blue-600 hover:text-blue-700">Forgot?</button>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                                <label style={{
+                                    fontSize: 11.5, fontWeight: 600, textTransform: 'uppercase',
+                                    letterSpacing: '.05em', color: 'var(--text-2)',
+                                }}>
+                                    Password <span style={{ color: 'var(--color-error)' }} aria-hidden="true">*</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    style={{
+                                        fontSize: 11.5, fontWeight: 700, color: 'var(--color-primary)',
+                                        background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.color = 'var(--color-primary-hover)'}
+                                    onMouseLeave={e => e.currentTarget.style.color = 'var(--color-primary)'}
+                                >
+                                    Forgot password?
+                                </button>
                             </div>
                             <FormInput
                                 type="password"
                                 icon={Lock}
                                 placeholder="••••••••"
                                 error={errors.password?.message}
+                                autoComplete="current-password"
                                 {...register('password', { required: 'Password is required' })}
                             />
                         </div>
 
-                        <div className="pt-2">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full h-11 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70"
-                            >
-                                {loading ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                ) : (
-                                    <>
-                                        Sign In
-                                        <ArrowRight size={16} />
-                                    </>
-                                )}
-                            </button>
-                        </div>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{
+                                width: '100%', height: 44,
+                                background: loading ? 'var(--color-primary-hover)' : 'var(--color-primary)',
+                                color: '#fff', border: 'none', borderRadius: 10,
+                                fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
+                                cursor: loading ? 'not-allowed' : 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                transition: 'all .18s', boxShadow: 'var(--shadow-brand)',
+                                marginTop: 4,
+                            }}
+                            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'var(--color-primary-hover)'; }}
+                            onMouseLeave={e => { if (!loading) e.currentTarget.style.background = 'var(--color-primary)'; }}
+                        >
+                            {loading ? (
+                                <div style={{
+                                    width: 18, height: 18, border: '2.5px solid rgba(255,255,255,.3)',
+                                    borderTopColor: '#fff', borderRadius: '50%',
+                                    animation: 'spin 0.8s linear infinite',
+                                }} />
+                            ) : (
+                                <>Sign In <ArrowRight size={16} /></>
+                            )}
+                        </button>
                     </form>
 
-                    {/* Quick Demo */}
-                    <div className="mt-8 pt-8 border-t border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] text-center mb-4">Quick Demo Access</p>
-                        <div className="flex gap-3">
-                            {quickLogins.map(ql => (
-                                <button
+                    {/* Quick Demo Access */}
+                    <div style={{ marginTop: 28, paddingTop: 24, borderTop: '1px solid var(--border)' }}>
+                        <p style={{
+                            fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.1em',
+                            color: 'var(--text-3)', textAlign: 'center', marginBottom: 14,
+                        }}>
+                            Quick Demo Access
+                        </p>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            {QUICK_LOGINS.map(ql => (
+                                <motion.button
                                     key={ql.role}
+                                    whileHover={{ y: -2, scale: 1.02 }}
+                                    whileTap={{ scale: .97 }}
                                     onClick={() => fillLogin(ql)}
-                                    className="flex-1 py-2 px-1 rounded-lg border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all text-center group"
+                                    title={`Login as ${ql.role}`}
+                                    style={{
+                                        flex: 1, padding: '10px 6px', borderRadius: 9,
+                                        background: ql.bg, border: `1px solid ${ql.border}`,
+                                        cursor: 'pointer', textAlign: 'center', transition: 'all .15s',
+                                        fontFamily: 'inherit',
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,.08)'}
+                                    onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
                                 >
-                                    <div className="text-sm mb-0.5 group-hover:scale-110 transition-transform">{ql.badge}</div>
-                                    <div className="text-[10px] font-bold text-slate-500 group-hover:text-blue-600">{ql.role}</div>
-                                </button>
+                                    <div style={{ fontSize: 18, marginBottom: 4, lineHeight: 1 }}>{ql.badge}</div>
+                                    <div style={{ fontSize: 11, fontWeight: 700, color: ql.color, letterSpacing: '.04em' }}>{ql.role}</div>
+                                </motion.button>
                             ))}
                         </div>
+                        <p style={{ margin: '10px 0 0', fontSize: 10.5, color: 'var(--text-3)', textAlign: 'center', lineHeight: 1.4 }}>
+                            Click a role to fill credentials → then Sign In
+                        </p>
                     </div>
                 </div>
 
-                <div className="mt-8 text-center flex flex-col gap-4">
-                    <p className="text-xs text-slate-400">
-                        By signing in, you agree to our <span className="text-slate-600 font-medium cursor-pointer">Terms of Service</span>
+                {/* Footer */}
+                <div style={{ marginTop: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <p style={{ fontSize: 11.5, color: 'var(--text-3)', margin: 0 }}>
+                        By signing in, you agree to our{' '}
+                        <span style={{ color: 'var(--text-2)', fontWeight: 600, cursor: 'pointer' }}>Terms of Service</span>
                     </p>
-                    <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-300 font-medium tracking-wide uppercase">
-                        <Shield size={10} />
-                        Enterprise Grade Security
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                        fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.09em',
+                        color: 'var(--text-dim)',
+                    }}>
+                        <Shield size={9} />
+                        HIPAA Compliant · Enterprise Grade Security
                     </div>
                 </div>
-            </div>
+            </motion.div>
+
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
     );
 }

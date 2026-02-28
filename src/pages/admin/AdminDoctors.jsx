@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// ADMIN - DOCTORS MANAGEMENT PAGE
+// ADMIN — DOCTORS MANAGEMENT PAGE (theme-aware)
 // ═══════════════════════════════════════════════════════
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -60,14 +60,18 @@ export default function AdminDoctors() {
             key: 'user',
             label: 'Doctor',
             render: (_, row) => (
-                <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                        style={{ background: getAvatarGradient(row.user?.name) }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                        width: 36, height: 36, borderRadius: 9,
+                        background: getAvatarGradient(row.user?.name),
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0,
+                    }}>
                         {getInitials(row.user?.name)}
                     </div>
                     <div>
-                        <p className="font-medium text-white">{row.user?.name}</p>
-                        <p className="text-xs text-gray-500">{row.user?.email}</p>
+                        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: 'var(--text-1)' }}>{row.user?.name}</p>
+                        <p style={{ margin: 0, fontSize: 11.5, color: 'var(--text-3)', marginTop: 1 }}>{row.user?.email}</p>
                     </div>
                 </div>
             )
@@ -77,7 +81,11 @@ export default function AdminDoctors() {
             key: 'department',
             label: 'Department',
             render: (_, row) => (
-                <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/15 text-blue-300 border border-blue-500/20">
+                <span style={{
+                    padding: '3px 10px', borderRadius: 99, fontSize: 11.5, fontWeight: 600,
+                    background: 'var(--color-primary-light)', color: 'var(--color-primary)',
+                    border: '1px solid var(--color-primary-mid)',
+                }}>
                     {row.department?.name}
                 </span>
             )
@@ -85,15 +93,42 @@ export default function AdminDoctors() {
         {
             key: 'fee',
             label: 'Consultation Fee',
-            render: (fee) => <span className="text-emerald-400 font-semibold">{formatCurrency(fee)}</span>
+            render: (fee) => (
+                <span style={{ color: 'var(--color-success)', fontWeight: 700, fontSize: 13.5 }}>
+                    {formatCurrency(fee)}
+                </span>
+            )
         },
         {
             key: 'id',
             label: 'Actions',
             render: (_, row) => (
-                <div className="flex gap-2">
-                    <button className="p-1.5 rounded-lg text-blue-400 hover:bg-blue-400/10 transition-colors"><Edit2 size={14} /></button>
-                    <button onClick={() => handleDelete(row.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-400/10 transition-colors"><Trash2 size={14} /></button>
+                <div style={{ display: 'flex', gap: 4 }}>
+                    <button
+                        aria-label={`Edit ${row.user?.name}`}
+                        style={{
+                            padding: '6px', borderRadius: 7, border: '1px solid transparent',
+                            background: 'transparent', color: 'var(--color-primary)',
+                            cursor: 'pointer', display: 'flex', transition: 'all .15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-light)'; e.currentTarget.style.borderColor = 'var(--color-primary-mid)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                    >
+                        <Edit2 size={14} />
+                    </button>
+                    <button
+                        aria-label={`Delete ${row.user?.name}`}
+                        onClick={() => handleDelete(row.id)}
+                        style={{
+                            padding: '6px', borderRadius: 7, border: '1px solid transparent',
+                            background: 'transparent', color: 'var(--color-error)',
+                            cursor: 'pointer', display: 'flex', transition: 'all .15s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-error-light)'; e.currentTarget.style.borderColor = 'rgba(214,69,69,.2)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                    >
+                        <Trash2 size={14} />
+                    </button>
                 </div>
             )
         },
@@ -107,23 +142,32 @@ export default function AdminDoctors() {
                 <AnimatedButton icon={Plus} size="sm" onClick={() => setShowModal(true)}>Add Doctor</AnimatedButton>
             }
         >
-            {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Department stats */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
                 {departments.map((dept, idx) => (
                     <motion.div
                         key={dept.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="bg-slate-800/60 border border-white/8 rounded-xl p-4 text-center"
+                        transition={{ delay: idx * 0.04 }}
+                        style={{
+                            background: 'var(--bg-card)', border: '1px solid var(--border)',
+                            borderRadius: 10, padding: '16px', textAlign: 'center',
+                            boxShadow: 'var(--shadow-card)', transition: 'all .2s',
+                            cursor: 'default',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-primary-mid)'; e.currentTarget.style.background = 'var(--color-primary-light)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-card)'; }}
                     >
-                        <p className="text-2xl font-bold text-white">{dept.doctorCount}</p>
-                        <p className="text-xs text-gray-500 mt-1">{dept.name}</p>
+                        <p style={{ margin: 0, fontSize: 24, fontWeight: 800, color: 'var(--color-primary)', fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}>
+                            {dept.doctorCount}
+                        </p>
+                        <p style={{ margin: 0, fontSize: 11.5, color: 'var(--text-3)', marginTop: 6 }}>{dept.name}</p>
                     </motion.div>
                 ))}
             </div>
 
-            <AnimatedCard hover={false}>
+            <AnimatedCard hover={false} padding="p-0">
                 <DataTable
                     columns={columns}
                     data={doctors}
@@ -147,24 +191,44 @@ export default function AdminDoctors() {
                     </>
                 }
             >
-                <div className="space-y-4">
-                    <FormInput label="Full Name" placeholder="Dr. John Smith" error={errors.name?.message}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <FormInput label="Full Name" placeholder="Dr. John Smith" error={errors.name?.message} required
                         {...register('name', { required: 'Name is required' })} />
-                    <FormInput label="Email" type="email" placeholder="doctor@medicare.pro" error={errors.email?.message}
+                    <FormInput label="Email" type="email" placeholder="doctor@medicare.pro" error={errors.email?.message} required
                         {...register('email', { required: 'Email is required' })} />
-                    <FormInput label="Password" type="password" placeholder="••••••••" error={errors.password?.message}
+                    <FormInput label="Password" type="password" placeholder="Min 6 characters" error={errors.password?.message} required
                         {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Min 6 characters' } })} />
-                    <FormInput label="Specialization" placeholder="e.g. Cardiologist" error={errors.specialization?.message}
+                    <FormInput label="Specialization" placeholder="e.g. Cardiologist" error={errors.specialization?.message} required
                         {...register('specialization', { required: 'Required' })} />
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">Department <span className="text-red-400">*</span></label>
-                        <select {...register('department_id', { required: 'Required' })}
-                            className="w-full rounded-xl border border-white/10 bg-slate-800/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all">
+                        <label style={{
+                            display: 'block', fontSize: 11.5, fontWeight: 600, textTransform: 'uppercase',
+                            letterSpacing: '.05em', color: 'var(--text-2)', marginBottom: 6,
+                        }}>
+                            Department <span style={{ color: 'var(--color-error)' }} aria-hidden="true">*</span>
+                        </label>
+                        <select
+                            {...register('department_id', { required: 'Required' })}
+                            style={{
+                                width: '100%', borderRadius: 8, border: `1px solid ${errors.department_id ? 'var(--color-error)' : 'var(--border-strong)'}`,
+                                background: 'var(--bg-input)', padding: '0 14px', height: 40,
+                                fontSize: 13.5, color: 'var(--text-1)', outline: 'none', fontFamily: 'inherit',
+                                transition: 'all .15s', appearance: 'none',
+                                cursor: 'pointer',
+                            }}
+                            onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(30,90,168,0.12)'; }}
+                            onBlur={e => { e.target.style.borderColor = errors.department_id ? 'var(--color-error)' : 'var(--border-strong)'; e.target.style.boxShadow = 'none'; }}
+                        >
                             <option value="">Select Department</option>
                             {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                         </select>
+                        {errors.department_id && (
+                            <p style={{ fontSize: 11.5, color: 'var(--color-error)', marginTop: 4 }}>{errors.department_id.message}</p>
+                        )}
                     </div>
-                    <FormInput label="Consultation Fee ($)" type="number" placeholder="250" error={errors.fee?.message}
+
+                    <FormInput label="Consultation Fee ($)" type="number" placeholder="250" error={errors.fee?.message} required
                         {...register('fee', { required: 'Required', min: { value: 1, message: 'Must be > 0' } })} />
                 </div>
             </Modal>

@@ -120,6 +120,12 @@ export const appointments = [
     { id: 28, patient_id: 8, doctor_id: 9, appointment_date: '2025-03-10', appointment_time: '13:00', status: 'Scheduled' },
     { id: 29, patient_id: 9, doctor_id: 10, appointment_date: '2025-03-11', appointment_time: '16:00', status: 'Scheduled' },
     { id: 30, patient_id: 10, doctor_id: 1, appointment_date: '2025-03-12', appointment_time: '09:30', status: 'Scheduled' },
+    // ── TODAY's appointments (2026-02-28) for Dr. Wilson (doctor_id=1) ──
+    { id: 31, patient_id: 1, doctor_id: 1, appointment_date: '2026-02-28', appointment_time: '09:00', status: 'Scheduled' },
+    { id: 32, patient_id: 2, doctor_id: 1, appointment_date: '2026-02-28', appointment_time: '10:00', status: 'Scheduled' },
+    { id: 33, patient_id: 3, doctor_id: 1, appointment_date: '2026-02-28', appointment_time: '11:00', status: 'Scheduled' },
+    { id: 34, patient_id: 4, doctor_id: 1, appointment_date: '2026-02-28', appointment_time: '14:00', status: 'Scheduled' },
+    { id: 35, patient_id: 5, doctor_id: 1, appointment_date: '2026-02-28', appointment_time: '15:30', status: 'Scheduled' },
 ];
 
 // 6. PRESCRIPTIONS (10 prescriptions)

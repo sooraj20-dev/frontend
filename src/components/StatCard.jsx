@@ -1,17 +1,35 @@
 // ═══════════════════════════════════════════════════════
-// STAT CARD — animated counter, theme-aware
+// STAT CARD — animated counter, enterprise KPI style
 // ═══════════════════════════════════════════════════════
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
 const COLOR_MAP = {
-    blue: { orb: '#3b82f6', text: '#60a5fa', grad: 'linear-gradient(135deg,#2563eb,#3b82f6)', light: 'rgba(59,130,246,.1)' },
-    teal: { orb: '#14b8a6', text: '#2dd4bf', grad: 'linear-gradient(135deg,#0d9488,#14b8a6)', light: 'rgba(20,184,166,.1)' },
-    purple: { orb: '#8b5cf6', text: '#a78bfa', grad: 'linear-gradient(135deg,#7c3aed,#8b5cf6)', light: 'rgba(139,92,246,.1)' },
-    green: { orb: '#22c55e', text: '#4ade80', grad: 'linear-gradient(135deg,#16a34a,#22c55e)', light: 'rgba(34,197,94,.1)' },
-    orange: { orb: '#f59e0b', text: '#fbbf24', grad: 'linear-gradient(135deg,#d97706,#f59e0b)', light: 'rgba(245,158,11,.1)' },
-    red: { orb: '#ef4444', text: '#f87171', grad: 'linear-gradient(135deg,#dc2626,#ef4444)', light: 'rgba(239,68,68,.1)' },
+    blue: {
+        orb: '#1E5AA8', textLight: '#1E5AA8', iconClass: 'kpi-icon-blue',
+        trend: { pos: 'rgba(46,173,103,.12)', neg: 'rgba(214,69,69,.1)' },
+    },
+    teal: {
+        orb: '#1FA79A', textLight: '#1FA79A', iconClass: 'kpi-icon-teal',
+        trend: { pos: 'rgba(46,173,103,.12)', neg: 'rgba(214,69,69,.1)' },
+    },
+    purple: {
+        orb: '#7C3AED', textLight: '#6D28D9', iconClass: 'kpi-icon-purple',
+        trend: { pos: 'rgba(46,173,103,.12)', neg: 'rgba(214,69,69,.1)' },
+    },
+    green: {
+        orb: '#2EAD67', textLight: '#2EAD67', iconClass: 'kpi-icon-green',
+        trend: { pos: 'rgba(46,173,103,.12)', neg: 'rgba(214,69,69,.1)' },
+    },
+    orange: {
+        orb: '#F4A300', textLight: '#D97706', iconClass: 'kpi-icon-orange',
+        trend: { pos: 'rgba(46,173,103,.12)', neg: 'rgba(214,69,69,.1)' },
+    },
+    red: {
+        orb: '#D64545', textLight: '#D64545', iconClass: 'kpi-icon-red',
+        trend: { pos: 'rgba(46,173,103,.12)', neg: 'rgba(214,69,69,.1)' },
+    },
 };
 
 function useCounter(target, duration = 1200) {
@@ -34,6 +52,7 @@ function useCounter(target, duration = 1200) {
 export default function StatCard({ title, value = 0, icon: Icon, color = 'blue', trend, trendLabel, prefix = '', delay = 0 }) {
     const c = COLOR_MAP[color] || COLOR_MAP.blue;
     const displayVal = useCounter(typeof value === 'number' ? Math.round(value) : 0, 1000);
+    const positiveTrend = typeof trend === 'number' && trend >= 0;
 
     return (
         <motion.div
@@ -47,31 +66,41 @@ export default function StatCard({ title, value = 0, icon: Icon, color = 'blue',
 
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--text-3)', marginBottom: 10 }}>
+                    <p style={{
+                        fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+                        letterSpacing: '.08em', color: 'var(--text-3)', marginBottom: 12,
+                    }}>
                         {title}
                     </p>
-                    <p style={{ fontSize: 28, fontWeight: 800, color: 'var(--text-1)', fontFamily: 'Plus Jakarta Sans, Inter, sans-serif', lineHeight: 1 }}>
+                    <p className="kpi-value">
                         {prefix}{displayVal.toLocaleString()}
                     </p>
                     {trend !== undefined && (
                         <div style={{
-                            display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 10,
-                            padding: '2px 8px', borderRadius: 8, fontSize: 11.5, fontWeight: 700,
-                            background: trend >= 0 ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)',
-                            color: trend >= 0 ? '#22c55e' : '#ef4444',
+                            display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 12,
+                            padding: '3px 8px', borderRadius: 6, fontSize: 11.5, fontWeight: 700,
+                            background: positiveTrend ? 'var(--color-success-light)' : 'var(--color-error-light)',
+                            color: positiveTrend ? 'var(--color-success)' : 'var(--color-error)',
                         }}>
-                            {trend >= 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-                            {trend >= 0 ? '+' : ''}{trend}%
-                            {trendLabel && <span style={{ fontWeight: 400, opacity: .75 }}>{' '}{trendLabel}</span>}
+                            {positiveTrend
+                                ? <TrendingUp size={11} aria-hidden="true" />
+                                : <TrendingDown size={11} aria-hidden="true" />
+                            }
+                            <span aria-label={`${positiveTrend ? 'up' : 'down'} ${Math.abs(trend)} percent`}>
+                                {positiveTrend ? '+' : ''}{trend}%
+                            </span>
+                            {trendLabel && (
+                                <span style={{ fontWeight: 400, opacity: .8 }}>{' '}{trendLabel}</span>
+                            )}
                         </div>
                     )}
                 </div>
-                <div style={{
-                    width: 44, height: 44, borderRadius: 13, flexShrink: 0,
-                    background: c.light, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    border: `1px solid ${c.orb}25`,
+
+                <div className={c.iconClass} style={{
+                    width: 46, height: 46, borderRadius: 12, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                    {Icon && <Icon size={20} style={{ color: c.text }} />}
+                    {Icon && <Icon size={20} strokeWidth={2} aria-hidden="true" />}
                 </div>
             </div>
         </motion.div>

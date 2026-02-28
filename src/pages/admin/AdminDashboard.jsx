@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Stethoscope, Calendar, DollarSign, AlertCircle, Plus, ArrowRight, Clock } from 'lucide-react';
+import { Users, Stethoscope, Calendar, DollarSign, AlertCircle, Plus, ArrowRight, Clock, Activity } from 'lucide-react';
 import {
     AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -41,11 +41,11 @@ const ChartTip = ({ active, payload, label }) => {
 };
 
 const ACTIVITY = [
-    { icon: '📅', text: 'New appointment booked for Dr. Wilson', time: '2 min ago', color: '#3b82f6' },
-    { icon: '💊', text: 'Prescription added for Patient #1024', time: '8 min ago', color: '#14b8a6' },
-    { icon: '💰', text: 'Bill #B-2045 paid — $280.00', time: '22 min ago', color: '#22c55e' },
-    { icon: '👤', text: 'New patient registered: Oliver Walsh', time: '45 min ago', color: '#8b5cf6' },
-    { icon: '⚠️', text: 'Appointment #A-1067 cancelled', time: '1 hr ago', color: '#f59e0b' },
+    { icon: '📅', text: 'New appointment booked for Dr. Wilson', time: '2 min ago', color: 'var(--color-primary)', bg: 'var(--color-primary-light)' },
+    { icon: '💊', text: 'Prescription added for Patient #1024', time: '8 min ago', color: 'var(--color-teal)', bg: 'var(--color-teal-light)' },
+    { icon: '💰', text: 'Bill #B-2045 paid — $280.00', time: '22 min ago', color: 'var(--color-success)', bg: 'var(--color-success-light)' },
+    { icon: '👤', text: 'New patient registered: Oliver Walsh', time: '45 min ago', color: '#7C3AED', bg: 'rgba(124,58,237,.1)' },
+    { icon: '⚠️', text: 'Appointment #A-1067 cancelled', time: '1 hr ago', color: 'var(--color-warning)', bg: 'var(--color-warning-light)' },
 ];
 
 export default function AdminDashboard() {
@@ -74,23 +74,24 @@ export default function AdminDashboard() {
 
             {/* ── Emergency banner ─────────────────────────── */}
             <div
+                role="alert"
                 style={{
-                    background: '#fef2f2',
-                    border: '1px solid #fee2e2',
-                    borderRadius: 12, padding: '12px 20px',
+                    background: 'var(--color-error-light)',
+                    border: '1px solid rgba(214,69,69,0.2)',
+                    borderRadius: 10, padding: '14px 20px',
                     display: 'flex', alignItems: 'center', gap: 14,
                 }}
             >
                 <div style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: '#fee2e2',
+                    width: 36, height: 36, borderRadius: 9,
+                    background: 'rgba(214,69,69,0.15)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 }}>
-                    <AlertCircle size={16} color="#ef4444" />
+                    <AlertCircle size={17} color="var(--color-error)" aria-hidden="true" />
                 </div>
                 <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#991b1b', margin: 0 }}>Emergency Hotline Active</p>
-                    <p style={{ fontSize: 12, color: '#b91c1c', margin: 0, marginTop: 1, opacity: 0.8 }}>3 emergency cases in queue • ICU Bed 4 available</p>
+                    <p style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--color-error)', margin: 0 }}>Emergency Hotline Active</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-2)', margin: 0, marginTop: 2 }}>3 emergency cases in queue · ICU Bed 4 available</p>
                 </div>
                 <button className="btn btn-danger btn-sm">View Emergency</button>
             </div>
@@ -102,8 +103,8 @@ export default function AdminDashboard() {
                 ) : (<>
                     <StatCard title="Total Doctors" value={stats.doctors} icon={Stethoscope} color="blue" trend={8} trendLabel="vs last month" delay={0} />
                     <StatCard title="Total Patients" value={stats.patients} icon={Users} color="teal" trend={12} trendLabel="new this month" delay={1} />
-                    <StatCard title="Appointments" value={stats.appointments} icon={Calendar} color="purple" trend={-3} trendLabel="vs last week" delay={2} />
-                    <StatCard title="Revenue" value={stats.revenue} icon={DollarSign} color="green" trend={18} trendLabel="this month" prefix="$" delay={3} />
+                    <StatCard title="Appointments" value={stats.appointments} icon={Activity} color="purple" trend={-3} trendLabel="vs last week" delay={2} />
+                    <StatCard title="Total Revenue" value={stats.revenue} icon={DollarSign} color="green" trend={18} trendLabel="this month" prefix="$" delay={3} />
                 </>)}
             </div>
 
@@ -247,8 +248,8 @@ export default function AdminDashboard() {
                                 style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}
                             >
                                 <div style={{
-                                    width: 32, height: 32, borderRadius: 10, fontSize: 14,
-                                    background: `${a.color}18`,
+                                    width: 32, height: 32, borderRadius: 9, fontSize: 14,
+                                    background: a.bg,
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                                 }}>
                                     {a.icon}

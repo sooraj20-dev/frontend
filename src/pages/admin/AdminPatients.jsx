@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// ADMIN - PATIENTS MANAGEMENT PAGE
+// ADMIN — PATIENTS MANAGEMENT PAGE (theme-aware)
 // ═══════════════════════════════════════════════════════
 import { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, UserRound } from 'lucide-react';
@@ -14,6 +14,21 @@ import { getAllPatients, deletePatient, createPatient } from '../../services/pat
 import { createUser } from '../../services/userService.js';
 import { getInitials, getAvatarGradient } from '../../utils/index.js';
 import { useForm } from 'react-hook-form';
+
+const selectStyle = (hasError) => ({
+    width: '100%', borderRadius: 8, height: 40,
+    border: `1px solid ${hasError ? 'var(--color-error)' : 'var(--border-strong)'}`,
+    background: 'var(--bg-input)', padding: '0 14px',
+    fontSize: 13.5, color: 'var(--text-1)', outline: 'none',
+    fontFamily: 'inherit', transition: 'all .15s', appearance: 'none', cursor: 'pointer',
+});
+
+const textareaStyle = {
+    width: '100%', borderRadius: 8, border: '1px solid var(--border-strong)',
+    background: 'var(--bg-input)', padding: '10px 14px',
+    fontSize: 13.5, color: 'var(--text-1)', outline: 'none',
+    fontFamily: 'inherit', resize: 'none', transition: 'all .15s',
+};
 
 export default function AdminPatients() {
     const [patients, setPatients] = useState([]);
@@ -48,42 +63,82 @@ export default function AdminPatients() {
         load();
     };
 
+    const actionBtnStyle = (color) => ({
+        padding: '6px', borderRadius: 7, border: '1px solid transparent',
+        background: 'transparent', cursor: 'pointer', display: 'flex',
+        transition: 'all .15s', color,
+    });
+
     const columns = [
         {
             key: 'user',
             label: 'Patient',
             render: (_, row) => (
-                <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-bold"
-                        style={{ background: getAvatarGradient(row.user?.name) }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                        width: 36, height: 36, borderRadius: 9,
+                        background: getAvatarGradient(row.user?.name),
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#fff', fontSize: 12, fontWeight: 700, flexShrink: 0,
+                    }}>
                         {getInitials(row.user?.name)}
                     </div>
                     <div>
-                        <p className="font-medium text-white">{row.user?.name}</p>
-                        <p className="text-xs text-gray-500">{row.user?.email}</p>
+                        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: 'var(--text-1)' }}>{row.user?.name}</p>
+                        <p style={{ margin: 0, fontSize: 11.5, color: 'var(--text-3)', marginTop: 1 }}>{row.user?.email}</p>
                     </div>
                 </div>
             )
         },
-        { key: 'age', label: 'Age', sortable: true, render: (age) => <span className="text-gray-300">{age} yrs</span> },
         {
-            key: 'gender',
-            label: 'Gender',
+            key: 'age', label: 'Age', sortable: true,
+            render: (age) => <span style={{ color: 'var(--text-2)', fontSize: 13.5 }}>{age} yrs</span>
+        },
+        {
+            key: 'gender', label: 'Gender',
             render: (gender) => (
-                <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${gender === 'Male' ? 'bg-blue-500/10 text-blue-300 border-blue-500/20' : 'bg-pink-500/10 text-pink-300 border-pink-500/20'}`}>
+                <span style={{
+                    padding: '3px 10px', borderRadius: 99, fontSize: 11.5, fontWeight: 600,
+                    background: gender === 'Male' ? 'var(--color-primary-light)' : 'rgba(236,72,153,.1)',
+                    color: gender === 'Male' ? 'var(--color-primary)' : '#BE185D',
+                    border: `1px solid ${gender === 'Male' ? 'var(--color-primary-mid)' : 'rgba(236,72,153,.2)'}`,
+                }}>
                     {gender}
                 </span>
             )
         },
         { key: 'phone', label: 'Phone' },
-        { key: 'address', label: 'Address', render: (a) => <span className="text-gray-400 text-xs truncate max-w-xs block">{a}</span> },
         {
-            key: 'id',
-            label: 'Actions',
+            key: 'address', label: 'Address',
+            render: (a) => (
+                <span style={{
+                    color: 'var(--text-3)', fontSize: 12.5,
+                    maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap', display: 'block',
+                }}>{a}</span>
+            )
+        },
+        {
+            key: 'id', label: 'Actions',
             render: (_, row) => (
-                <div className="flex gap-2">
-                    <button className="p-1.5 rounded-lg text-blue-400 hover:bg-blue-400/10 transition-colors"><Edit2 size={14} /></button>
-                    <button onClick={() => handleDelete(row.id)} className="p-1.5 rounded-lg text-red-400 hover:bg-red-400/10 transition-colors"><Trash2 size={14} /></button>
+                <div style={{ display: 'flex', gap: 4 }}>
+                    <button
+                        aria-label={`Edit ${row.user?.name}`}
+                        style={actionBtnStyle('var(--color-primary)')}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-primary-light)'; e.currentTarget.style.borderColor = 'var(--color-primary-mid)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                    >
+                        <Edit2 size={14} />
+                    </button>
+                    <button
+                        aria-label={`Delete ${row.user?.name}`}
+                        onClick={() => handleDelete(row.id)}
+                        style={actionBtnStyle('var(--color-error)')}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-error-light)'; e.currentTarget.style.borderColor = 'rgba(214,69,69,.2)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                    >
+                        <Trash2 size={14} />
+                    </button>
                 </div>
             )
         },
@@ -95,7 +150,7 @@ export default function AdminPatients() {
             subtitle={`${patients.length} registered patients`}
             actions={<AnimatedButton icon={Plus} size="sm" onClick={() => setShowModal(true)}>Add Patient</AnimatedButton>}
         >
-            <AnimatedCard hover={false}>
+            <AnimatedCard hover={false} padding="p-0">
                 <DataTable
                     columns={columns}
                     data={patients}
@@ -117,32 +172,52 @@ export default function AdminPatients() {
                     </>
                 }
             >
-                <div className="space-y-4">
-                    <FormInput label="Full Name" placeholder="Alice Johnson" error={errors.name?.message}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <FormInput label="Full Name" placeholder="Alice Johnson" error={errors.name?.message} required
                         {...register('name', { required: 'Required' })} />
-                    <FormInput label="Email" type="email" placeholder="patient@email.com" error={errors.email?.message}
+                    <FormInput label="Email" type="email" placeholder="patient@email.com" error={errors.email?.message} required
                         {...register('email', { required: 'Required' })} />
-                    <FormInput label="Password" type="password" placeholder="••••••••" error={errors.password?.message}
+                    <FormInput label="Password" type="password" placeholder="Min 6 characters" error={errors.password?.message} required
                         {...register('password', { required: 'Required', minLength: { value: 6, message: 'Min 6 chars' } })} />
-                    <div className="grid grid-cols-2 gap-3">
-                        <FormInput label="Age" type="number" placeholder="30" error={errors.age?.message}
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <FormInput label="Age" type="number" placeholder="30" error={errors.age?.message} required
                             {...register('age', { required: 'Required' })} />
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1.5">Gender <span className="text-red-400">*</span></label>
-                            <select {...register('gender', { required: 'Required' })}
-                                className="w-full rounded-xl border border-white/10 bg-slate-800/80 px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
-                                <option value="">Select</option>
+                            <label style={{
+                                display: 'block', fontSize: 11.5, fontWeight: 600, textTransform: 'uppercase',
+                                letterSpacing: '.05em', color: 'var(--text-2)', marginBottom: 6,
+                            }}>Gender <span style={{ color: 'var(--color-error)' }} aria-hidden="true">*</span></label>
+                            <select
+                                {...register('gender', { required: 'Required' })}
+                                style={selectStyle(!!errors.gender)}
+                                onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(30,90,168,0.12)'; }}
+                                onBlur={e => { e.target.style.borderColor = 'var(--border-strong)'; e.target.style.boxShadow = 'none'; }}
+                            >
+                                <option value="">Select gender</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
+                            {errors.gender && <p style={{ margin: 0, marginTop: 4, fontSize: 11.5, color: 'var(--color-error)' }}>{errors.gender.message}</p>}
                         </div>
                     </div>
-                    <FormInput label="Phone" placeholder="+1-555-0100" error={errors.phone?.message}
+
+                    <FormInput label="Phone" placeholder="+1-555-0100" error={errors.phone?.message} required
                         {...register('phone', { required: 'Required' })} />
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">Address</label>
-                        <textarea {...register('address')} rows={2} placeholder="123 Main St, City, State"
-                            className="w-full rounded-xl border border-white/10 bg-slate-800/80 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-blue-500 resize-none" />
+                        <label style={{
+                            display: 'block', fontSize: 11.5, fontWeight: 600, textTransform: 'uppercase',
+                            letterSpacing: '.05em', color: 'var(--text-2)', marginBottom: 6,
+                        }}>Address</label>
+                        <textarea
+                            {...register('address')}
+                            rows={2}
+                            placeholder="123 Main St, City, State"
+                            style={textareaStyle}
+                            onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(30,90,168,0.12)'; }}
+                            onBlur={e => { e.target.style.borderColor = 'var(--border-strong)'; e.target.style.boxShadow = 'none'; }}
+                        />
                     </div>
                 </div>
             </Modal>

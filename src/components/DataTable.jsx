@@ -62,7 +62,7 @@ export default function DataTable({
                             borderRadius: 10, fontSize: 13, color: 'var(--text-1)',
                             fontFamily: 'inherit', outline: 'none', transition: 'all .15s',
                         }}
-                        onFocus={e => { e.target.style.borderColor = 'rgba(59,130,246,.5)'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,.1)'; }}
+                        onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(30,90,168,0.12)'; }}
                         onBlur={e => { e.target.style.borderColor = 'var(--border-strong)'; e.target.style.boxShadow = 'none'; }}
                     />
                 </div>
@@ -83,8 +83,8 @@ export default function DataTable({
                                         {col.label}
                                         {col.sortable && (
                                             <span style={{ display: 'flex', flexDirection: 'column', opacity: sortKey === col.key ? 1 : 0.3 }}>
-                                                <ChevronUp size={9} style={{ color: sortKey === col.key && sortDir === 'asc' ? '#3b82f6' : 'inherit', marginBottom: -3 }} />
-                                                <ChevronDown size={9} style={{ color: sortKey === col.key && sortDir === 'desc' ? '#3b82f6' : 'inherit' }} />
+                                                <ChevronUp size={9} style={{ color: sortKey === col.key && sortDir === 'asc' ? 'var(--color-primary)' : 'inherit', marginBottom: -3 }} />
+                                                <ChevronDown size={9} style={{ color: sortKey === col.key && sortDir === 'desc' ? 'var(--color-primary)' : 'inherit' }} />
                                             </span>
                                         )}
                                     </div>
@@ -153,8 +153,8 @@ export default function DataTable({
                                 <button key={n} onClick={() => setPage(n)}
                                     style={{
                                         width: 28, height: 28, borderRadius: 8, border: '1px solid',
-                                        borderColor: page === n ? '#3b82f6' : 'var(--border)',
-                                        background: page === n ? '#3b82f6' : 'var(--bg-input)',
+                                        borderColor: page === n ? 'var(--color-primary)' : 'var(--border)',
+                                        background: page === n ? 'var(--color-primary)' : 'var(--bg-input)',
                                         color: page === n ? '#fff' : 'var(--text-2)',
                                         fontWeight: page === n ? 700 : 500,
                                         cursor: 'pointer', fontSize: 12.5,

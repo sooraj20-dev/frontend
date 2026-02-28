@@ -1,9 +1,10 @@
 // ═══════════════════════════════════════════════════════
-// DOCTOR DASHBOARD PAGE
+// DOCTOR DASHBOARD PAGE — fully theme-aware
 // ═══════════════════════════════════════════════════════
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, DollarSign, Users, Plus, FileText, ChevronRight, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, Clock, DollarSign, Users, FileText, CheckCircle, X, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PageWrapper from '../../components/PageWrapper.jsx';
 import StatCard from '../../components/StatCard.jsx';
@@ -22,6 +23,7 @@ import { useForm } from 'react-hook-form';
 
 export default function DoctorDashboard() {
     const { user } = useAuthStore();
+    const navigate = useNavigate();
     const [doctor, setDoctor] = useState(null);
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -56,36 +58,53 @@ export default function DoctorDashboard() {
         setShowRxModal(false); reset();
     };
 
+    const actionBtnStyle = (color) => ({
+        padding: '6px', borderRadius: 7, border: '1px solid transparent',
+        background: 'transparent', cursor: 'pointer', display: 'flex',
+        transition: 'all .15s', color,
+    });
+
     return (
         <PageWrapper title={`Good day, ${user.name.split(' ').slice(-1)[0]}!`} subtitle="Here's your schedule overview.">
+
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                 {loading ? (
                     [...Array(4)].map((_, i) => <SkeletonStatCard key={i} />)
                 ) : (
                     <>
                         <StatCard title="Today's Appointments" value={todayAppts.length} icon={Calendar} color="blue" delay={0} />
                         <StatCard title="Total Patients" value={appointments.length} icon={Users} color="teal" delay={1} />
-                        <StatCard title="Appointments" value={appointments.length} icon={Clock} color="purple" delay={2} />
+                        <StatCard title="All Appointments" value={appointments.length} icon={Clock} color="purple" delay={2} />
                         <StatCard title="Estimated Earnings" value={totalEarnings} icon={DollarSign} color="green" prefix="$" delay={3} />
                     </>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                {/* Timeline */}
-                <AnimatedCard className="xl:col-span-2" hover={false} padding="p-0">
-                    <div className="px-6 pt-5 pb-3 flex items-center justify-between border-b border-white/8">
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,2fr) minmax(0,1fr)', gap: 16 }}>
+
+                {/* Today's Appointments Timeline */}
+                <AnimatedCard hover={false} padding="p-0">
+                    <div style={{
+                        padding: '18px 22px 14px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        borderBottom: '1px solid var(--border)',
+                    }}>
                         <div>
-                            <h3 className="font-semibold text-white">Today's Appointments</h3>
-                            <p className="text-xs text-gray-500">{todayAppts.length} scheduled for today</p>
+                            <h3 className="section-title">Today's Appointments</h3>
+                            <p className="label" style={{ marginTop: 3 }}>{todayAppts.length} scheduled for today</p>
                         </div>
                     </div>
-                    <div className="divide-y divide-white/5">
+
+                    <div>
                         {todayAppts.length === 0 ? (
-                            <div className="flex flex-col items-center py-12 text-gray-500">
-                                <span className="text-4xl mb-3">😌</span>
-                                <p className="text-sm">No appointments today. Enjoy your day!</p>
+                            <div style={{
+                                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                justifyContent: 'center', padding: '48px 24px',
+                                color: 'var(--text-3)', textAlign: 'center',
+                            }}>
+                                <span style={{ fontSize: 36, marginBottom: 12, lineHeight: 1 }}>😌</span>
+                                <p style={{ fontSize: 13.5, color: 'var(--text-2)' }}>No appointments today. Enjoy your day!</p>
                             </div>
                         ) : todayAppts.map((appt, idx) => (
                             <motion.div
@@ -93,35 +112,89 @@ export default function DoctorDashboard() {
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="flex items-center gap-4 px-6 py-4 hover:bg-white/3 transition-colors"
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: 14,
+                                    padding: '14px 22px',
+                                    borderBottom: idx < todayAppts.length - 1 ? '1px solid var(--border)' : 'none',
+                                    transition: 'background .12s',
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-panel)'}
+                                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                             >
-                                <div className="text-center flex-shrink-0 w-12">
-                                    <p className="text-xs text-gray-500">TIME</p>
-                                    <p className="text-sm font-bold text-white">{formatTime(appt.appointment_time)}</p>
+                                {/* Time column */}
+                                <div style={{ textAlign: 'center', flexShrink: 0, width: 50 }}>
+                                    <p className="label">Time</p>
+                                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', marginTop: 2 }}>
+                                        {formatTime(appt.appointment_time)}
+                                    </p>
                                 </div>
-                                <div className="w-px h-10 bg-white/10" />
+
+                                {/* Divider */}
+                                <div style={{ width: 1, height: 36, background: 'var(--border)', flexShrink: 0 }} />
+
+                                {/* Avatar */}
                                 <div
-                                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 cursor-pointer"
-                                    style={{ background: getAvatarGradient(appt.patient?.user?.name) }}
+                                    title={`View ${appt.patient?.user?.name}`}
+                                    style={{
+                                        width: 38, height: 38, borderRadius: '50%',
+                                        background: getAvatarGradient(appt.patient?.user?.name),
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: '#fff', fontSize: 12, fontWeight: 700,
+                                        flexShrink: 0, cursor: 'pointer',
+                                        transition: 'transform .15s',
+                                    }}
                                     onClick={() => setSelectedPatient(appt)}
+                                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                                 >
                                     {getInitials(appt.patient?.user?.name)}
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-medium text-white">{appt.patient?.user?.name}</p>
-                                    <p className="text-xs text-gray-500">Age {appt.patient?.age} • {appt.patient?.gender}</p>
+
+                                {/* Patient info — clickable name navigates to prescription writer */}
+                                <div
+                                    style={{ flex: 1, minWidth: 0, cursor: 'pointer' }}
+                                    onClick={() => navigate(`/doctor/prescriptions/write?appointmentId=${appt.id}`)}
+                                    title={`Write prescription for ${appt.patient?.user?.name}`}
+                                >
+                                    <p style={{
+                                        margin: 0, fontSize: 13.5, fontWeight: 600,
+                                        color: 'var(--color-primary)',
+                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                        textDecoration: 'underline', textDecorationColor: 'var(--color-primary-mid)',
+                                        textUnderlineOffset: 3,
+                                    }}
+                                        onMouseEnter={e => e.currentTarget.style.textDecorationColor = 'var(--color-primary)'}
+                                        onMouseLeave={e => e.currentTarget.style.textDecorationColor = 'var(--color-primary-mid)'}
+                                    >
+                                        {appt.patient?.user?.name}
+                                    </p>
+                                    <p style={{ margin: 0, fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 }}>
+                                        Age {appt.patient?.age} · {appt.patient?.gender} · Click to write Rx
+                                    </p>
                                 </div>
-                                <div className="flex items-center gap-2">
+
+                                {/* Status + Actions */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                                     <StatusBadge status={appt.status} size="sm" />
                                     {appt.status === 'Scheduled' && (
-                                        <div className="flex gap-1">
-                                            <button onClick={() => { setRxAppt(appt); setShowRxModal(true); }}
-                                                className="p-1.5 rounded-lg text-teal-400 hover:bg-teal-400/10 transition-colors" title="Add Rx">
-                                                <FileText size={14} />
+                                        <div style={{ display: 'flex', gap: 2 }}>
+                                            <button
+                                                onClick={() => navigate(`/doctor/prescriptions/write?appointmentId=${appt.id}`)}
+                                                title="Write Prescription"
+                                                style={actionBtnStyle('var(--color-teal)')}
+                                                onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-teal-light)'; e.currentTarget.style.borderColor = 'var(--color-teal-mid)'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                                            >
+                                                <FileText size={13} />
                                             </button>
-                                            <button onClick={() => handleComplete(appt.id)}
-                                                className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-400/10 transition-colors" title="Complete">
-                                                ✓
+                                            <button
+                                                onClick={() => handleComplete(appt.id)}
+                                                title="Mark Complete"
+                                                style={actionBtnStyle('var(--color-success)')}
+                                                onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-success-light)'; e.currentTarget.style.borderColor = 'var(--color-success-mid)'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                                            >
+                                                <CheckCircle size={13} />
                                             </button>
                                         </div>
                                     )}
@@ -129,15 +202,23 @@ export default function DoctorDashboard() {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Upcoming section */}
                     {todayAppts.length === 0 && upcoming.length > 0 && (
-                        <div className="px-6 pb-5">
-                            <p className="text-sm font-semibold text-white mb-3">Upcoming Appointments</p>
-                            <div className="space-y-2">
+                        <div style={{ padding: '16px 22px 20px' }}>
+                            <h4 className="section-title" style={{ marginBottom: 12 }}>Upcoming Appointments</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {upcoming.slice(0, 3).map(a => (
-                                    <div key={a.id} className="flex items-center justify-between p-3 bg-slate-700/40 rounded-xl">
+                                    <div key={a.id} style={{
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                        padding: '10px 14px', background: 'var(--bg-panel)',
+                                        border: '1px solid var(--border)', borderRadius: 10,
+                                    }}>
                                         <div>
-                                            <p className="text-sm text-white">{a.patient?.user?.name}</p>
-                                            <p className="text-xs text-gray-500">{formatDate(a.appointment_date, { month: 'short', day: 'numeric' })} • {formatTime(a.appointment_time)}</p>
+                                            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>{a.patient?.user?.name}</p>
+                                            <p style={{ margin: 0, fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 }}>
+                                                {formatDate(a.appointment_date, { month: 'short', day: 'numeric' })} · {formatTime(a.appointment_time)}
+                                            </p>
                                         </div>
                                         <StatusBadge status={a.status} size="sm" />
                                     </div>
@@ -147,64 +228,83 @@ export default function DoctorDashboard() {
                     )}
                 </AnimatedCard>
 
-                {/* Doctor info + Quick stats */}
-                <div className="space-y-4">
+                {/* Right Column */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                    {/* Doctor Profile Card */}
                     {doctor && (
                         <AnimatedCard hover={false}>
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-lg"
-                                    style={{ background: getAvatarGradient(doctor.user?.name) }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+                                <div style={{
+                                    width: 52, height: 52, borderRadius: 14,
+                                    background: getAvatarGradient(doctor.user?.name),
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    color: '#fff', fontWeight: 700, fontSize: 18, flexShrink: 0,
+                                }}>
                                     {getInitials(doctor.user?.name)}
                                 </div>
                                 <div>
-                                    <p className="font-bold text-white">{doctor.user?.name}</p>
-                                    <p className="text-xs text-gray-500">{doctor.specialization}</p>
+                                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-1)' }}>{doctor.user?.name}</p>
+                                    <p style={{ margin: 0, fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{doctor.specialization}</p>
                                 </div>
                             </div>
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-400">Department</span>
-                                    <span className="text-blue-400 font-medium">{doctor.department?.name}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-400">Consultation Fee</span>
-                                    <span className="text-emerald-400 font-bold">{formatCurrency(doctor.fee)}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-400">Total Appointments</span>
-                                    <span className="text-white font-medium">{appointments.length}</span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-400">Completed</span>
-                                    <span className="text-white font-medium">{appointments.filter(a => a.status === 'Completed').length}</span>
-                                </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                {[
+                                    { label: 'Department', value: doctor.department?.name, valueColor: 'var(--color-primary)', bold: true },
+                                    { label: 'Consultation Fee', value: formatCurrency(doctor.fee), valueColor: 'var(--color-success)', bold: true },
+                                    { label: 'Total Appointments', value: appointments.length, valueColor: 'var(--text-1)' },
+                                    { label: 'Completed', value: appointments.filter(a => a.status === 'Completed').length, valueColor: 'var(--text-1)' },
+                                ].map(({ label, value, valueColor, bold }) => (
+                                    <div key={label} style={{
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                        padding: '8px 0', borderBottom: '1px solid var(--border)',
+                                    }}>
+                                        <span style={{ fontSize: 13, color: 'var(--text-3)' }}>{label}</span>
+                                        <span style={{ fontSize: 13, color: valueColor, fontWeight: bold ? 600 : 400 }}>{value}</span>
+                                    </div>
+                                ))}
                             </div>
                         </AnimatedCard>
                     )}
 
-                    {/* AI Health Assistant UI */}
-                    <AnimatedCard hover={false} className="relative overflow-hidden" padding="p-5">
-                        <div className="absolute inset-0 gradient-blue-purple opacity-10" />
-                        <div className="relative">
-                            <div className="flex items-center gap-2 mb-3">
-                                <div className="w-8 h-8 rounded-xl bg-purple-500/30 flex items-center justify-center">🤖</div>
+                    {/* AI Health Assistant Card */}
+                    <AnimatedCard hover={false} style={{ overflow: 'hidden', position: 'relative' }}>
+                        <div style={{
+                            position: 'absolute', inset: 0, opacity: 0.06,
+                            background: 'linear-gradient(135deg, #7C3AED, #1FA79A)',
+                            pointerEvents: 'none',
+                        }} />
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                                <div style={{
+                                    width: 34, height: 34, borderRadius: 9,
+                                    background: 'rgba(124,58,237,.12)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <Sparkles size={16} style={{ color: '#7C3AED' }} />
+                                </div>
                                 <div>
-                                    <p className="text-sm font-semibold text-white">AI Health Assistant</p>
-                                    <p className="text-xs text-gray-400">Beta</p>
+                                    <p style={{ margin: 0, fontSize: 13.5, fontWeight: 700, color: 'var(--text-1)' }}>AI Health Assistant</p>
+                                    <span style={{
+                                        fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 99,
+                                        background: 'rgba(124,58,237,.1)', color: '#7C3AED',
+                                        textTransform: 'uppercase', letterSpacing: '.06em',
+                                    }}>Beta</span>
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-300 mb-3">
-                                AI suggests: 3 patients may need follow-up based on their history.
+                            <p style={{ fontSize: 12.5, color: 'var(--text-2)', marginBottom: 12, lineHeight: 1.5 }}>
+                                3 patients may need follow-up based on their history.
                             </p>
-                            <div className="space-y-2">
-                                {['Patient #1024 - Cardiac follow-up', 'Patient #1031 - Medication review'].map((s, i) => (
-                                    <div key={i} className="flex items-center gap-2 text-xs text-gray-400">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 flex-shrink-0" />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 14 }}>
+                                {['Patient #1024 — Cardiac follow-up', 'Patient #1031 — Medication review'].map((s, i) => (
+                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--text-2)' }}>
+                                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#7C3AED', flexShrink: 0 }} />
                                         {s}
                                     </div>
                                 ))}
                             </div>
-                            <AnimatedButton variant="outline" size="xs" className="mt-3 border-purple-500/50 text-purple-300">
+                            <AnimatedButton variant="ghost" size="sm" style={{ borderColor: 'rgba(124,58,237,.3)', color: '#7C3AED', fontSize: 12 }}>
                                 View AI Insights
                             </AnimatedButton>
                         </div>
@@ -212,78 +312,150 @@ export default function DoctorDashboard() {
                 </div>
             </div>
 
-            {/* Patient Drawer */}
+            {/* Patient Details Drawer */}
             <AnimatePresence>
                 {selectedPatient && (
-                    <motion.div
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                        className="fixed right-0 top-0 bottom-0 w-80 bg-slate-900 border-l border-white/10 z-50 overflow-y-auto scroll-area"
-                    >
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="font-semibold text-white">Patient Details</h3>
-                                <button onClick={() => setSelectedPatient(null)} className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
-                                    <X size={18} />
-                                </button>
-                            </div>
-                            <div className="text-center mb-6">
-                                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white font-bold text-xl mx-auto mb-3"
-                                    style={{ background: getAvatarGradient(selectedPatient.patient?.user?.name) }}>
-                                    {getInitials(selectedPatient.patient?.user?.name)}
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            style={{ position: 'fixed', inset: 0, background: 'rgba(15,25,45,.4)', backdropFilter: 'blur(4px)', zIndex: 40 }}
+                            onClick={() => setSelectedPatient(null)}
+                        />
+                        <motion.div
+                            initial={{ x: '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '100%' }}
+                            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+                            style={{
+                                position: 'fixed', right: 0, top: 0, bottom: 0, width: 320,
+                                background: 'var(--bg-surface)', borderLeft: '1px solid var(--border)',
+                                zIndex: 50, overflowY: 'auto',
+                            }}
+                            className="scroll-area"
+                            role="dialog"
+                            aria-label="Patient Details"
+                        >
+                            <div style={{ padding: 24 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                                    <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-1)' }}>Patient Details</h3>
+                                    <button
+                                        onClick={() => setSelectedPatient(null)}
+                                        aria-label="Close patient details"
+                                        style={{
+                                            padding: '6px', borderRadius: 7, background: 'var(--bg-panel)',
+                                            border: '1px solid var(--border)', color: 'var(--text-3)',
+                                            cursor: 'pointer', display: 'flex', transition: 'all .15s',
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-1)'; e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+                                    >
+                                        <X size={16} />
+                                    </button>
                                 </div>
-                                <p className="font-bold text-white text-lg">{selectedPatient.patient?.user?.name}</p>
-                                <p className="text-sm text-gray-400">{selectedPatient.patient?.gender} • {selectedPatient.patient?.age} years</p>
-                            </div>
-                            <div className="space-y-3">
-                                {[
-                                    { label: 'Phone', value: selectedPatient.patient?.phone },
-                                    { label: 'Address', value: selectedPatient.patient?.address },
-                                    { label: 'Appointment', value: formatDate(selectedPatient.appointment_date) },
-                                    { label: 'Time', value: formatTime(selectedPatient.appointment_time) },
-                                ].map(({ label, value }) => (
-                                    <div key={label} className="bg-slate-800/60 rounded-xl p-3">
-                                        <p className="text-xs text-gray-500 mb-1">{label}</p>
-                                        <p className="text-sm text-white">{value}</p>
+
+                                <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                                    <div style={{
+                                        width: 64, height: 64, borderRadius: 16,
+                                        background: getAvatarGradient(selectedPatient.patient?.user?.name),
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: '#fff', fontWeight: 700, fontSize: 20, margin: '0 auto 12px',
+                                    }}>
+                                        {getInitials(selectedPatient.patient?.user?.name)}
                                     </div>
-                                ))}
-                            </div>
-                            {selectedPatient.prescription && (
-                                <div className="mt-4 bg-teal-500/10 border border-teal-500/20 rounded-xl p-4">
-                                    <p className="text-xs text-teal-400 font-semibold mb-1">Prescription</p>
-                                    <p className="text-sm text-white">{selectedPatient.prescription.diagnosis}</p>
-                                    <p className="text-xs text-gray-400 mt-1">{selectedPatient.prescription.note}</p>
+                                    <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-1)' }}>
+                                        {selectedPatient.patient?.user?.name}
+                                    </p>
+                                    <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-3)', marginTop: 4 }}>
+                                        {selectedPatient.patient?.gender} · {selectedPatient.patient?.age} years
+                                    </p>
                                 </div>
-                            )}
-                        </div>
-                    </motion.div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    {[
+                                        { label: 'Phone', value: selectedPatient.patient?.phone },
+                                        { label: 'Address', value: selectedPatient.patient?.address },
+                                        { label: 'Appointment', value: formatDate(selectedPatient.appointment_date) },
+                                        { label: 'Time', value: formatTime(selectedPatient.appointment_time) },
+                                    ].map(({ label, value }) => (
+                                        <div key={label} style={{
+                                            background: 'var(--bg-panel)', border: '1px solid var(--border)',
+                                            borderRadius: 9, padding: '10px 14px',
+                                        }}>
+                                            <p className="label" style={{ marginBottom: 3 }}>{label}</p>
+                                            <p style={{ margin: 0, fontSize: 13.5, color: 'var(--text-1)' }}>{value || '—'}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {selectedPatient.prescription && (
+                                    <div style={{
+                                        marginTop: 12, padding: 14,
+                                        background: 'var(--color-teal-light)',
+                                        border: '1px solid var(--color-teal-mid)',
+                                        borderRadius: 10,
+                                    }}>
+                                        <p style={{ margin: 0, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--color-teal)', marginBottom: 6 }}>Prescription</p>
+                                        <p style={{ margin: 0, fontSize: 13.5, color: 'var(--text-1)' }}>{selectedPatient.prescription.diagnosis}</p>
+                                        <p style={{ margin: 0, fontSize: 12, color: 'var(--text-2)', marginTop: 4 }}>{selectedPatient.prescription.note}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 
             {/* Add Prescription Modal */}
-            <Modal isOpen={showRxModal} onClose={() => { setShowRxModal(false); reset(); }} title="Add Prescription" size="md"
+            <Modal
+                isOpen={showRxModal}
+                onClose={() => { setShowRxModal(false); reset(); }}
+                title="Add Prescription"
+                size="md"
                 footer={
                     <>
                         <AnimatedButton variant="ghost" onClick={() => { setShowRxModal(false); reset(); }}>Cancel</AnimatedButton>
                         <AnimatedButton icon={FileText} onClick={handleSubmit(addPrescription)}>Save Prescription</AnimatedButton>
                     </>
-                }>
-                <div className="space-y-4">
+                }
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {rxAppt && (
-                        <div className="bg-slate-800/60 rounded-xl p-3 text-sm">
-                            <p className="text-gray-400">Patient: <span className="text-white font-medium">{rxAppt.patient?.user?.name}</span></p>
-                            <p className="text-gray-400">Date: <span className="text-white">{formatDate(rxAppt.appointment_date)}</span></p>
+                        <div style={{
+                            background: 'var(--bg-panel)', border: '1px solid var(--border)',
+                            borderRadius: 9, padding: '10px 14px', fontSize: 13,
+                        }}>
+                            <p style={{ margin: 0, color: 'var(--text-3)' }}>
+                                Patient: <span style={{ color: 'var(--text-1)', fontWeight: 600 }}>{rxAppt.patient?.user?.name}</span>
+                            </p>
+                            <p style={{ margin: 0, color: 'var(--text-3)', marginTop: 3 }}>
+                                Date: <span style={{ color: 'var(--text-2)' }}>{formatDate(rxAppt.appointment_date)}</span>
+                            </p>
                         </div>
                     )}
                     <FormInput label="Diagnosis" placeholder="e.g. Hypertension" error={errors.diagnosis?.message}
                         {...register('diagnosis', { required: 'Required' })} />
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1.5">Notes & Instructions</label>
-                        <textarea {...register('note', { required: 'Required' })} rows={4}
+                        <label style={{
+                            display: 'block', fontSize: 11.5, fontWeight: 600, textTransform: 'uppercase',
+                            letterSpacing: '.05em', color: 'var(--text-2)', marginBottom: 6,
+                        }}>
+                            Notes & Instructions
+                        </label>
+                        <textarea
+                            {...register('note', { required: 'Required' })}
+                            rows={4}
                             placeholder="Medication, dosage, instructions..."
-                            className="w-full rounded-xl border border-white/10 bg-slate-800/80 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-blue-500 resize-none" />
+                            style={{
+                                width: '100%', borderRadius: 8,
+                                border: `1px solid ${errors.note ? 'var(--color-error)' : 'var(--border-strong)'}`,
+                                background: 'var(--bg-input)', padding: '10px 14px',
+                                fontSize: 13.5, color: 'var(--text-1)', outline: 'none',
+                                fontFamily: 'inherit', resize: 'none', transition: 'all .15s',
+                            }}
+                            onFocus={e => { e.target.style.borderColor = 'var(--color-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(30,90,168,0.12)'; }}
+                            onBlur={e => { e.target.style.borderColor = errors.note ? 'var(--color-error)' : 'var(--border-strong)'; e.target.style.boxShadow = 'none'; }}
+                        />
+                        {errors.note && <p style={{ margin: 0, marginTop: 4, fontSize: 11.5, color: 'var(--color-error)' }}>{errors.note.message}</p>}
                     </div>
                 </div>
             </Modal>

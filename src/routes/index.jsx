@@ -21,6 +21,7 @@ import DoctorDashboard from '../pages/doctor/DoctorDashboard.jsx';
 import DoctorAppointments from '../pages/doctor/DoctorAppointments.jsx';
 import DoctorPatients from '../pages/doctor/DoctorPatients.jsx';
 import DoctorPrescriptions from '../pages/doctor/DoctorPrescriptions.jsx';
+import PrescriptionWriter from '../pages/doctor/PrescriptionWriter.jsx';
 import DoctorEarnings from '../pages/doctor/DoctorEarnings.jsx';
 
 // Patient pages
@@ -64,6 +65,7 @@ export const router = createBrowserRouter([
             { path: 'appointments', element: <DoctorAppointments /> },
             { path: 'patients', element: <DoctorPatients /> },
             { path: 'prescriptions', element: <DoctorPrescriptions /> },
+            { path: 'prescriptions/write', element: <PrescriptionWriter /> },
             { path: 'earnings', element: <DoctorEarnings /> },
         ],
     },

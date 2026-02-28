@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// SIDEBAR — Professional, clean, fully theme-aware
+// SIDEBAR — Enterprise, theme-aware, fully accessible
 // ═══════════════════════════════════════════════════════
 import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,13 +40,12 @@ const NAV = {
 };
 
 const ROLE_META = {
-    admin: { label: 'Administrator', color: '#8b5cf6', bg: 'rgba(139,92,246,.12)', border: 'rgba(139,92,246,.25)' },
-    doctor: { label: 'Physician', color: '#3b82f6', bg: 'rgba(59,130,246,.12)', border: 'rgba(59,130,246,.25)' },
-    patient: { label: 'Patient', color: '#14b8a6', bg: 'rgba(20,184,166,.12)', border: 'rgba(20,184,166,.25)' },
+    admin: { label: 'Administrator', color: '#7C3AED', bg: 'rgba(124,58,237,.1)', border: 'rgba(124,58,237,.2)' },
+    doctor: { label: 'Physician', color: '#1E5AA8', bg: 'rgba(30,90,168,.1)', border: 'rgba(30,90,168,.2)' },
+    patient: { label: 'Patient', color: '#1FA79A', bg: 'rgba(31,167,154,.1)', border: 'rgba(31,167,154,.2)' },
 };
 
-/* ── Sidebar widths ───────────────────────────────────── */
-const EXPANDED_W = 240;
+const EXPANDED_W = 248;
 const COLLAPSED_W = 68;
 
 export default function Sidebar({ mobile = false, onCloseMobile }) {
@@ -68,11 +67,11 @@ export default function Sidebar({ mobile = false, onCloseMobile }) {
         <motion.aside
             initial={false}
             animate={{ width: w }}
-            transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
             style={{
                 height: '100%',
-                background: 'var(--bg-surface)',
-                borderRight: '1px solid var(--border)',
+                background: 'var(--sidebar-bg)',
+                borderRight: '1px solid var(--sidebar-border)',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
@@ -84,41 +83,51 @@ export default function Sidebar({ mobile = false, onCloseMobile }) {
             {/* ── Logo ── */}
             <div style={{
                 padding: collapsed ? '0' : '0 20px',
-                height: 72,
+                height: 64,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 gap: 12,
                 flexShrink: 0,
+                borderBottom: '1px solid var(--border)',
             }}>
                 <div style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
-                    background: '#2563eb',
+                    width: 34,
+                    height: 34,
+                    borderRadius: 9,
+                    background: 'var(--color-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 4px 12px rgba(37,99,235,.2)',
+                    boxShadow: 'var(--shadow-brand)',
                     flexShrink: 0,
                 }}>
-                    <HeartPulse size={18} color="#fff" strokeWidth={2.5} />
+                    <HeartPulse size={18} color="#fff" strokeWidth={2} />
                 </div>
 
                 {!collapsed && (
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="font-display font-bold text-lg text-slate-900 tracking-tight"
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: .15 }}
                         style={{ flex: 1 }}
                     >
-                        MediCare<span className="text-blue-600">Pro</span>
+                        <span style={{
+                            fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                            fontWeight: 800,
+                            fontSize: 17,
+                            letterSpacing: '-.025em',
+                            color: 'var(--text-1)',
+                        }}>
+                            MediCare<span style={{ color: 'var(--color-primary)' }}>Pro</span>
+                        </span>
                     </motion.div>
                 )}
 
                 {mobile && (
                     <button
                         onClick={onCloseMobile}
+                        aria-label="Close sidebar"
                         style={{
                             marginLeft: 'auto',
                             background: 'none',
@@ -126,105 +135,166 @@ export default function Sidebar({ mobile = false, onCloseMobile }) {
                             color: 'var(--text-3)',
                             cursor: 'pointer',
                             padding: '4px',
+                            borderRadius: 6,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                         }}
                     >
-                        <X size={20} />
+                        <X size={18} />
                     </button>
                 )}
             </div>
 
-            {/* ── User Profile (Collapsed/Expanded) ── */}
-            <div style={{ padding: collapsed ? '10px 0' : '0 16px 20px', display: 'flex', flexDirection: 'column', alignItems: collapsed ? 'center' : 'stretch' }}>
-                {!collapsed && (
+            {/* ── User Profile ── */}
+            <div style={{
+                padding: collapsed ? '14px 0' : '14px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: collapsed ? 'center' : 'stretch',
+                borderBottom: '1px solid var(--border)',
+                flexShrink: 0,
+            }}>
+                {!collapsed ? (
                     <div style={{
-                        padding: '12px',
-                        borderRadius: '12px',
-                        background: 'var(--bg-app)',
+                        padding: '10px 12px',
+                        borderRadius: 10,
+                        background: 'var(--bg-panel)',
                         border: '1px solid var(--border)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 12,
-                        marginBottom: '20px'
+                        gap: 10,
                     }}>
                         <div style={{
-                            width: 36, height: 36, borderRadius: '8px',
+                            width: 36, height: 36, borderRadius: 9,
                             background: getAvatarGradient(user?.name),
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: '#fff', fontSize: 13, fontWeight: 700
+                            color: '#fff', fontSize: 13, fontWeight: 700,
+                            flexShrink: 0,
                         }}>
                             {getInitials(user?.name)}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                            <div className="text-[13px] font-bold text-slate-900 truncate">{user?.name}</div>
-                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{role.label}</div>
+                            <div style={{
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: 'var(--text-1)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {user?.name}
+                            </div>
+                            <div style={{
+                                marginTop: 2,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '1px 7px',
+                                borderRadius: 99,
+                                fontSize: 10,
+                                fontWeight: 700,
+                                letterSpacing: '.06em',
+                                textTransform: 'uppercase',
+                                background: role.bg,
+                                color: role.color,
+                                border: `1px solid ${role.border}`,
+                            }}>
+                                {role.label}
+                            </div>
                         </div>
                     </div>
-                )}
-                {collapsed && (
-                    <div style={{
-                        width: 36, height: 36, borderRadius: '8px',
-                        background: getAvatarGradient(user?.name),
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontSize: 13, fontWeight: 700,
-                        marginBottom: '10px'
-                    }}>
+                ) : (
+                    <div
+                        title={user?.name}
+                        style={{
+                            width: 36, height: 36, borderRadius: 9,
+                            background: getAvatarGradient(user?.name),
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#fff', fontSize: 13, fontWeight: 700,
+                        }}>
                         {getInitials(user?.name)}
                     </div>
                 )}
             </div>
 
             {/* ── Navigation ── */}
-            <nav style={{
-                flex: 1,
-                overflowY: 'auto',
-                padding: '0 12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-            }}>
-                {!collapsed && <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] px-3 mb-2">Main Menu</div>}
+            <nav
+                aria-label="Main navigation"
+                style={{
+                    flex: 1,
+                    overflowY: 'auto',
+                    padding: collapsed ? '12px 8px' : '12px 10px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    scrollbarWidth: 'none',
+                }}
+            >
+                {!collapsed && (
+                    <div style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: 'var(--text-3)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '.12em',
+                        padding: '0 6px 8px',
+                    }}>
+                        Main Menu
+                    </div>
+                )}
 
                 {nav.map((item) => {
                     const active = isActive(item.path);
+                    const Icon = item.icon;
                     return (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             onClick={mobile ? onCloseMobile : undefined}
+                            title={collapsed ? item.label : undefined}
+                            aria-current={active ? 'page' : undefined}
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 12,
-                                padding: collapsed ? '10px 0' : '10px 14px',
-                                borderRadius: '10px',
+                                gap: 10,
+                                padding: collapsed ? '10px 0' : '9px 12px',
+                                borderRadius: 8,
                                 textDecoration: 'none',
                                 fontSize: '13.5px',
                                 fontWeight: active ? 600 : 500,
-                                color: active ? '#2563eb' : 'var(--text-2)',
-                                background: active ? 'rgba(37,99,235,0.06)' : 'transparent',
-                                transition: 'all 0.2s ease',
+                                color: active ? 'var(--color-primary)' : 'var(--text-2)',
+                                background: active ? 'var(--color-primary-light)' : 'transparent',
+                                border: active ? '1px solid var(--color-primary-mid)' : '1px solid transparent',
+                                transition: 'all 0.15s ease',
                                 justifyContent: collapsed ? 'center' : 'flex-start',
-                                position: 'relative'
+                                position: 'relative',
+                            }}
+                            onMouseEnter={e => {
+                                if (!active) {
+                                    e.currentTarget.style.color = 'var(--color-primary)';
+                                    e.currentTarget.style.background = 'var(--color-primary-light)';
+                                }
+                            }}
+                            onMouseLeave={e => {
+                                if (!active) {
+                                    e.currentTarget.style.color = 'var(--text-2)';
+                                    e.currentTarget.style.background = 'transparent';
+                                }
                             }}
                         >
-                            <item.icon
-                                size={18}
+                            <Icon
+                                size={17}
                                 strokeWidth={active ? 2.5 : 2}
                                 style={{ flexShrink: 0 }}
                             />
-                            {!collapsed && <span>{item.label}</span>}
+                            {!collapsed && <span style={{ flex: 1 }}>{item.label}</span>}
                             {active && !collapsed && (
-                                <motion.div
-                                    layoutId="sidebar-active-pill"
-                                    style={{
-                                        position: 'absolute',
-                                        right: '8px',
-                                        width: '4px',
-                                        height: '4px',
-                                        borderRadius: '50%',
-                                        background: '#2563eb'
-                                    }}
-                                />
+                                <div style={{
+                                    width: 6, height: 6,
+                                    borderRadius: '50%',
+                                    background: 'var(--color-primary)',
+                                    flexShrink: 0,
+                                }} />
                             )}
                         </NavLink>
                     );
@@ -233,54 +303,75 @@ export default function Sidebar({ mobile = false, onCloseMobile }) {
 
             {/* ── Footer ── */}
             <div style={{
-                padding: '20px 12px',
+                padding: collapsed ? '12px 8px' : '12px 10px',
                 borderTop: '1px solid var(--border)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 8
+                gap: 6,
+                flexShrink: 0,
             }}>
                 <button
                     onClick={logout}
+                    title="Sign out"
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 12,
-                        padding: collapsed ? '10px 0' : '10px 14px',
-                        borderRadius: '10px',
+                        gap: 10,
+                        padding: collapsed ? '9px 0' : '9px 12px',
+                        borderRadius: 8,
                         fontSize: '13.5px',
                         fontWeight: 500,
-                        color: '#ef4444',
+                        color: 'var(--color-error)',
                         background: 'transparent',
-                        border: 'none',
+                        border: '1px solid transparent',
                         cursor: 'pointer',
                         width: '100%',
                         justifyContent: collapsed ? 'center' : 'flex-start',
-                        transition: 'background 0.2s'
+                        transition: 'all 0.15s ease',
+                        fontFamily: 'inherit',
                     }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.05)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.background = 'var(--color-error-light)';
+                        e.currentTarget.style.borderColor = 'rgba(214,69,69,0.2)';
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.borderColor = 'transparent';
+                    }}
                 >
-                    <LogOut size={18} />
+                    <LogOut size={17} strokeWidth={2} />
                     {!collapsed && <span>Sign Out</span>}
                 </button>
 
                 {!mobile && (
                     <button
                         onClick={toggleSidebar}
+                        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             width: '100%',
-                            height: 32,
-                            background: 'var(--bg-app)',
+                            height: 30,
+                            background: 'var(--bg-panel)',
                             border: '1px solid var(--border)',
-                            borderRadius: '8px',
+                            borderRadius: 7,
                             color: 'var(--text-3)',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                        }}
+                        onMouseEnter={e => {
+                            e.currentTarget.style.color = 'var(--color-primary)';
+                            e.currentTarget.style.borderColor = 'var(--color-primary-mid)';
+                            e.currentTarget.style.background = 'var(--color-primary-light)';
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.color = 'var(--text-3)';
+                            e.currentTarget.style.borderColor = 'var(--border)';
+                            e.currentTarget.style.background = 'var(--bg-panel)';
                         }}
                     >
-                        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                        {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
                     </button>
                 )}
             </div>
